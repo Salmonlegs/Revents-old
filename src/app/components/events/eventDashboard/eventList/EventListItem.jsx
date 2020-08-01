@@ -5,8 +5,8 @@ import { Link } from 'react-router-dom';
 
 class EventListItem extends Component {
 	render() {
-		const { event, selectEvent } = this.props;
-		const { selectedEvent, setSelectedEvent, deleteEvent } = this.props;
+		const { event } = this.props;
+		const { deleteEvent } = this.props;
 		return (
 			<div style={{ paddingBottom: '1rem' }}>
 				<Segment.Group>
