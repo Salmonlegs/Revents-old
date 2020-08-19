@@ -1,25 +1,24 @@
 import React, { useState } from 'react';
-import { Menu, Button, Container } from 'semantic-ui-react';
+import { Menu, Button, Container, Image } from 'semantic-ui-react';
 import { NavLink } from 'react-router-dom';
 import SignedOutMenu from './SignedOutMenu';
 import SignedInMenu from './SignedInMenu';
 import { useHistory } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const NavBar = ({ setFormOpen }) => {
-	const history = useHistory();
-	const [authenticated, setAuthenticated] = useState(false);
-
-	function handleSignOut() {
-		setAuthenticated(false);
-		history.push('/');
-	}
+	const { authenticated } = useSelector((state) => state.auth);
 
 	return (
 		<div>
 			<Menu inverted fixed='top'>
 				<Container>
 					<Menu.Item header exact as={NavLink} to='/'>
-						<img src={require('../../../assets/images/logo.png')} alt='logo' />
+						<Image
+							src={require('../../../assets/images/logo.png')}
+							style={{ height: '3rem' }}
+							alt='logo'
+						/>
 						Re-vents
 					</Menu.Item>
 					<Menu.Item as={NavLink} to='/events' name='Events' />
@@ -31,11 +30,7 @@ const NavBar = ({ setFormOpen }) => {
 					) : (
 						''
 					)}
-					{authenticated ? (
-						<SignedInMenu setAuthenticated={setAuthenticated} SignOut={handleSignOut} />
-					) : (
-						<SignedOutMenu setAuthenticated={setAuthenticated} />
-					)}
+					{authenticated ? <SignedInMenu /> : <SignedOutMenu />}
 				</Container>
 			</Menu>
 		</div>

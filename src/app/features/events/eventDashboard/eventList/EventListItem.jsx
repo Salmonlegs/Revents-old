@@ -4,6 +4,7 @@ import EventListAttendee from './EventListAttendee';
 import { Link } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { deleteEvent } from '../../eventActions';
+import { format } from 'date-fns';
 
 export default function EventListItem({ event }) {
 	const dispatch = useDispatch();
@@ -14,7 +15,15 @@ export default function EventListItem({ event }) {
 				<Segment>
 					<Item.Group>
 						<Item>
-							<Item.Image size='tiny' circular src={event.hostPhotoURL} />
+							<Item.Image
+								size='tiny'
+								circular
+								src={
+									event.hostPhotoURL
+										? event.hostPhotoURL
+										: require(`../../../../../assets/images/user.png`)
+								}
+							/>
 							<Item.Content>
 								<Item.Header as='a' content={event.title}></Item.Header>
 								<Item.Description>Hosted by {event.host}</Item.Description>
@@ -24,7 +33,7 @@ export default function EventListItem({ event }) {
 				</Segment>
 				<Segment>
 					<span>
-						<Icon name='clock' /> {event.date} &nbsp;&nbsp;
+						<Icon name='clock' /> {format(event.date, 'MMMM d, yyyy h:mm a')} &nbsp;&nbsp;
 						<Icon name='marker' /> {event.venue}
 					</span>
 				</Segment>
