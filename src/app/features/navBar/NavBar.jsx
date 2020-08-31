@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Menu, Button, Container, Image } from 'semantic-ui-react';
 import { NavLink } from 'react-router-dom';
 import SignedOutMenu from './SignedOutMenu';
 import SignedInMenu from './SignedInMenu';
-import { useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 const NavBar = ({ setFormOpen }) => {

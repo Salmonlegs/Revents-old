@@ -1,29 +1,46 @@
-import React, { useState } from 'react';
-import { Segment, Button, Header, FormField, Label } from 'semantic-ui-react';
-import cuid from 'cuid';
-import { Link } from 'react-router-dom';
+/* global google */
+import React from 'react';
+import { Segment, Button, Header } from 'semantic-ui-react';
+import { Link, Redirect } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { updateEvent, createEvent } from '../eventActions';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
+import { listenToEvents } from '../eventActions';
+import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import MyTextInput from '../../../common/form/MyTextInput';
 import MyTextArea from '../../../common/form/MyTextArea';
 import MySelectInput from '../../../common/form/MySelectInput';
 import { categoryData } from '../../../api/CategoryOptions';
 import MyDateInput from '../../../common/form/MyDateInput';
+import MyPlaceInput from '../../../common/form/MyPlaceInput';
+import useFirestoreDoc from '../../../hooks/useFirestoreDoc';
+import {
+	listenToEventFromFirestore,
+	updateEventInFirestore,
+	addEventToFirestore,
+	cancelEventToggle,
+} from '../../../firestore/firestoreService';
+import LoadingComponent from '../../../layout/LoadingComponent';
+import { toast } from 'react-toastify';
 
 const EventForm = ({ match, history }) => {
 	const dispatch = useDispatch();
 	const selectedEvent = useSelector((state) =>
 		state.event.events.find((e) => e.id === match.params.id),
 	);
+	const { loading, error } = useSelector((state) => state.async);
 
 	const initialValues = selectedEvent
 		? selectedEvent
 		: {
 				title: '',
-				city: '',
-				venue: '',
+				city: {
+					address: '',
+					latLng: null,
+				},
+				venue: {
+					address: '',
+					latLng: null,
+				},
 				date: '',
 				host: '',
 				attendees: '',
@@ -34,31 +51,46 @@ const EventForm = ({ match, history }) => {
 		title: Yup.string().required('You must provide a title'),
 		category: Yup.string().required('You must provide a category'),
 		description: Yup.string().required('You must provide a description'),
-		city: Yup.string().required('You must provide a city'),
-		venue: Yup.string().required('You must provide a venue'),
+		city: Yup.object().shape({
+			address: Yup.string().required('City is required'),
+		}),
+		venue: Yup.object().shape({
+			address: Yup.string().required('Venue is required'),
+		}),
 		date: Yup.string().required('You must provide a date'),
 	});
 
+	useFirestoreDoc({
+		shouldExecute: !!match.params.id,
+		query: () => listenToEventFromFirestore(match.params.id),
+		data: (event) => dispatch(listenToEvents([event])),
+		deps: [match.params.id],
+	});
+
+	if (loading) return <LoadingComponent content='Loading Event...' />;
+
+	if (error) return <Redirect to='/error' />;
+
 	return (
-		<Segment>
+		<Segment style={{ height: 'fit-content' }}>
 			<Formik
 				initialValues={initialValues}
 				validationSchema={validationSchema}
-				onSubmit={(values) => {
-					selectedEvent
-						? dispatch(updateEvent({ ...selectedEvent, ...values }))
-						: dispatch(
-								createEvent({
-									...values,
-									id: cuid(),
-									attendees: [],
-									hostPhotoURL: '../../../assets/images/user.png',
-								}),
-						  );
-					history.push('/events');
+				onSubmit={async (values, { setSubmitting }) => {
+					try {
+						console.log('values', values);
+						selectedEvent
+							? await updateEventInFirestore(values)
+							: await addEventToFirestore(values);
+						setSubmitting(false);
+
+						history.push('/events');
+					} catch (error) {
+						toast.error(error.message);
+					}
 				}}
 			>
-				{({ isSubmitting, dirty, isValid }) => (
+				{({ isSubmitting, dirty, isValid, values }) => (
 					<Form className='ui form'>
 						<Header sub color='teal' content='Event Details' />
 						<MyTextInput name='title' placeholder='Event title' />
@@ -66,8 +98,17 @@ const EventForm = ({ match, history }) => {
 
 						<MyTextArea name='description' placeholder='Description' rows={3} />
 						<Header sub color='teal' content='Events Location Details' />
-						<MyTextInput name='city' placeholder='City' />
-						<MyTextInput name='venue' placeholder='Venue' />
+						<MyPlaceInput name='city' placeholder='City' />
+						<MyPlaceInput
+							name='venue'
+							disabled={!values.city.latLng}
+							placeholder='Venue'
+							options={{
+								location: new google.maps.LatLng(values.city.latLng),
+								radius: 1000,
+								types: ['establishment'],
+							}}
+						/>
 						<MyDateInput
 							name='date'
 							placeholderText='Event Date'
@@ -76,28 +117,42 @@ const EventForm = ({ match, history }) => {
 							timeCaption='time'
 							dateFormate='MMMM d, yyyy h:mm a'
 						/>
-						<Button
-							content='Submit'
-							loading={isSubmitting}
-							positive
-							type='submit'
-							disabled={!isValid || !dirty || isSubmitting}
-						/>
+						<div style={{ paddingTop: '1rem' }}>
+							{selectedEvent && (
+								<Button
+									type='button'
+									color={selectedEvent.isCancelled ? 'green' : 'red'}
+									content={selectedEvent.isCancelled ? 'Reactivate Event' : 'Cancel Event'}
+									floated='left'
+									f
+									onClick={() => {
+										cancelEventToggle(selectedEvent);
+									}}
+								/>
+							)}
+							<Button
+								content='Submit'
+								loading={isSubmitting}
+								positive
+								type='submit'
+								floated='right'
+								disabled={!isValid || !dirty || isSubmitting}
+							/>
 
-						<Button
-							type='button'
-							as={Link}
-							to={'/events'}
-							content='Cancel'
-							disabled={isSubmitting}
-						/>
+							<Button
+								type='button'
+								as={Link}
+								to={'/events'}
+								content='Cancel'
+								floated='right'
+								disabled={isSubmitting}
+							/>
+						</div>
 					</Form>
 				)}
 			</Formik>
 		</Segment>
 	);
 };
-
-console.log('MySelectInput', MySelectInput);
 
 export default EventForm;

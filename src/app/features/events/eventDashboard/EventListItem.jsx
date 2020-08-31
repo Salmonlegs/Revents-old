@@ -1,14 +1,11 @@
 import React from 'react';
-import { Segment, Item, Icon, Button } from 'semantic-ui-react';
+import { Segment, Item, Icon, Button, Label } from 'semantic-ui-react';
 import EventListAttendee from './EventListAttendee';
 import { Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { deleteEvent } from '../../eventActions';
 import { format } from 'date-fns';
+import { deleteEventInFirestore } from '../../../firestore/firestoreService';
 
 export default function EventListItem({ event }) {
-	const dispatch = useDispatch();
-
 	return (
 		<div style={{ paddingBottom: '1rem' }}>
 			<Segment.Group>
@@ -21,12 +18,20 @@ export default function EventListItem({ event }) {
 								src={
 									event.hostPhotoURL
 										? event.hostPhotoURL
-										: require(`../../../../../assets/images/user.png`)
+										: require('../../../../assets/images/user.png')
 								}
 							/>
 							<Item.Content>
 								<Item.Header as='a' content={event.title}></Item.Header>
-								<Item.Description>Hosted by {event.host}</Item.Description>
+								<Item.Description>Hosted by {event.hostedBy}</Item.Description>
+								{event.isCancelled && (
+									<Label
+										style={{ top: '-40px' }}
+										ribbon='right'
+										color='red'
+										content='This event has been cancelled'
+									/>
+								)}
 							</Item.Content>
 						</Item>
 					</Item.Group>
@@ -34,7 +39,7 @@ export default function EventListItem({ event }) {
 				<Segment>
 					<span>
 						<Icon name='clock' /> {format(event.date, 'MMMM d, yyyy h:mm a')} &nbsp;&nbsp;
-						<Icon name='marker' /> {event.venue}
+						<Icon name='marker' /> {event.venue.address}
 					</span>
 				</Segment>
 				<Segment secondary>
@@ -44,12 +49,14 @@ export default function EventListItem({ event }) {
 				</Segment>
 				<Segment clearing>
 					<span>{event.description}</span>
+
 					<Button
-						as='a'
 						color='red'
 						floated='right'
 						content='Delete Event'
-						onClick={() => dispatch(deleteEvent(event.id))}
+						onClick={() => {
+							console.log(deleteEventInFirestore(event.id));
+						}}
 					/>
 					<Button
 						as={Link}

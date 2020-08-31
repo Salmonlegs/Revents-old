@@ -22,7 +22,6 @@ export default function LoginForm() {
 					password: Yup.string().required(),
 				})}
 				onSubmit={(values, { setSubmitting }) => {
-					console.log(values);
 					dispatch(signInUser(values));
 					setSubmitting(false);
 					dispatch(closeModal());
