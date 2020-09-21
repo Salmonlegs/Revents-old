@@ -12,7 +12,7 @@ export default function useFirestoreDoc({ query, data, deps, shouldExecute = tru
 
 		const unsubscribe = query().onSnapshot(
 			(snapshot) => {
-				console.log('snapshots', snapshot);
+				////console.log('snapshot', snapshot);
 				if (!snapshot.exists) {
 					dispatch(asyncActionError({ code: 'not-found', message: 'Could not find document' }));
 					return;
@@ -22,7 +22,7 @@ export default function useFirestoreDoc({ query, data, deps, shouldExecute = tru
 			},
 			(error) => {
 				dispatch(asyncActionError());
-				console.log('asyncActionError');
+				////console.log('asyncActionError');
 			},
 		);
 		return () => {
@@ -30,3 +30,28 @@ export default function useFirestoreDoc({ query, data, deps, shouldExecute = tru
 		};
 	}, deps); //eslint-disable-line react-hooks/exhaustive-deps
 }
+
+// 	useEffect(() => {
+// 		if (!shouldExecute) return;
+// 		dispatch(asyncActionStart());
+
+// 		const unsubscribe = query().onSnapshot(
+// 			(snapshot) => {
+// 				console.log('snapshot', snapshot);
+// 				if (!snapshot.exists) {
+// 					dispatch(asyncActionError({ code: 'not-found', message: 'Could not find document' }));
+// 					return;
+// 				}
+// 				data(dataFromSnapshot(snapshot));
+// 				dispatch(asyncActionFinish());
+// 			},
+// 			(error) => {
+// 				dispatch(asyncActionError());
+// 				console.log('asyncActionError');
+// 			},
+// 		);
+// 		return () => {
+// 			unsubscribe();
+// 		};
+// 	}, deps); //eslint-disable-line react-hooks/exhaustive-deps
+// }

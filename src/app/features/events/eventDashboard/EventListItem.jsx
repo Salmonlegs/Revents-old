@@ -3,7 +3,6 @@ import { Segment, Item, Icon, Button, Label } from 'semantic-ui-react';
 import EventListAttendee from './EventListAttendee';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
-import { deleteEventInFirestore } from '../../../firestore/firestoreService';
 
 export default function EventListItem({ event }) {
 	return (
@@ -55,7 +54,7 @@ export default function EventListItem({ event }) {
 						floated='right'
 						content='Delete Event'
 						onClick={() => {
-							console.log(deleteEventInFirestore(event.id));
+							//console.log(deleteEventInFirestore(event.id));
 						}}
 					/>
 					<Button

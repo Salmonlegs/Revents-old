@@ -9,7 +9,7 @@ export function loadEvents() {
 			const events = await fetchSampleData();
 			dispatch({ type: FETCH_EVENTS, payload: events });
 			dispatch(asyncActionFinish());
-			console.log('dispatch: events', events);
+			//console.log('dispatch: events', events);
 		} catch (error) {
 			dispatch(asyncActionError(error));
 		}

@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Button } from 'semantic-ui-react';
-import { increment, decrement } from './testReducer';
+import { incrementAction, decrementAction } from './testReducer';
 import { openModal } from '../../common/modals/modalReducer';
 import TestPlaceInput from './TestPlaceInput';
 import TestMap from './TestMap';
 import MousePointerButton from './MousePointerButton';
+import { getCake } from './dessertReducer';
 
 export default function Sandbox() {
 	const dispatch = useDispatch();
+
+	const cakeCount = useSelector((state) => state.dessert.cakeCount);
+	const [inputValues, setInputValues] = useState(0);
 	const data = useSelector((state) => state.test.data);
-	const { loading } = useSelector((state) => state.async);
 	const defaultProps = {
 		center: {
 			lat: 59.95,
@@ -19,11 +22,6 @@ export default function Sandbox() {
 		zoom: 11,
 	};
 	const [location, setLocation] = useState(defaultProps);
-
-	const [target, setTarget] = useState(null);
-
-	const [counter, setCounter] = useState(0);
-
 	const [user, setUser] = useState({ firstName: '', lastName: '' });
 
 	function handleSetLocation(latLng) {
@@ -36,28 +34,44 @@ export default function Sandbox() {
 		});
 	}
 
+	function handleGetCake(numOfCakes) {
+		//console.log('numOfCakes', numOfCakes);
+		dispatch(getCake(numOfCakes));
+	}
+
 	return (
 		<div>
-			<h1>Testing 123</h1>
-			<h1>The data is: {data}</h1>
+			<div style={{ paddingBottom: '5rem' }}>
+				<h1>Welcome to the cake store</h1>
+				<h2>Choose from {cakeCount} cakes</h2>
+				<p>How many cakes which would you like?</p>
+				<div style={{ paddingBottom: '1rem' }}>
+					<form
+						onSubmit={(e) => {
+							e.preventDefault();
+							//console.log('e', e);
+							handleGetCake(inputValues);
+						}}
+					>
+						<input
+							type='number'
+							size='small'
+							name='numOfCakes'
+							onChange={(e) => setInputValues(e.target.value)}
+						></input>
+						<Button type='submit'>Click Me</Button>
+					</form>
+				</div>
+			</div>
+
+			<h1>The score is: {data}</h1>
+			<Button content='Increment' color='green' onClick={() => dispatch(incrementAction())} />
 			<Button
-				name='increment'
-				loading={loading && target === 'increment'}
-				content='Increment'
-				color='green'
-				onClick={(e) => {
-					dispatch(increment(5));
-					setTarget(e.target.name);
-				}}
-			/>
-			<Button
-				name='decrement'
-				loading={loading && target === 'decrement'}
 				content='Decrement'
 				color='red'
-				onClick={(e) => {
-					dispatch(decrement(10));
-					setTarget(e.target.name);
+				onClick={() => {
+					console.log(decrementAction);
+					dispatch(decrementAction());
 				}}
 			/>
 
@@ -67,7 +81,6 @@ export default function Sandbox() {
 				onClick={() => dispatch(openModal({ modalType: 'TestModal', modalProps: { data } }))}
 			/>
 
-			<Button content={counter} onClick={() => setCounter(counter + 1)} />
 			<div style={{ paddingTop: '0.5rem' }}>
 				<input
 					style={{ marginRight: '1rem' }}

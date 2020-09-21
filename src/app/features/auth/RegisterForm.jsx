@@ -6,40 +6,41 @@ import MyTextInput from '../../common/form/MyTextInput';
 import { Button, Label } from 'semantic-ui-react';
 import { useDispatch } from 'react-redux';
 import { closeModal } from '../../common/modals/modalReducer';
-import { signInWithEmail } from '../../firestore/firebaseService';
+import { registerInFirebase } from '../../firestore/firebaseService';
 
-export default function LoginForm() {
+export default function RegisterForm() {
 	const dispatch = useDispatch();
 	return (
-		<ModalWrapper size='mini' header='Sign in to Re-Vents'>
+		<ModalWrapper size='mini' header='Register to Re-Vents'>
 			<Formik
 				initialValues={{
+					displayName: '',
 					email: '',
 					password: '',
 				}}
 				validationSchema={Yup.object({
+					displayName: Yup.string().required(),
 					email: Yup.string().required().email(),
 					password: Yup.string().required(),
 				})}
 				onSubmit={async (values, { setSubmitting, setErrors }) => {
 					try {
-						await signInWithEmail(values);
+						await registerInFirebase(values);
 						setSubmitting(false);
 						dispatch(closeModal());
 					} catch (error) {
-						setErrors({ auth: error.message });
+						setErrors({ auth: 'Problem with username or password' });
 						setSubmitting(false);
 					}
 				}}
 			>
 				{({ isSubmitting, isValid, dirty, errors }) => (
 					<Form className='ui form'>
+						<MyTextInput name='displayName' placeholder='Display Name' />
 						<MyTextInput name='email' placeholder='Email Address' />
 						<MyTextInput name='password' placeholder='Password' type='password' />
 						{errors.auth && (
-							<>
-								<Label basic color='red' style={{ marginBottom: '10' }} content='Mmmm... na mate' />
-							</>
+							<Label basic color='red' style={{ marginBottom: 10 }} content={errors.auth} />
 						)}
 						<Button
 							loading={isSubmitting}
@@ -48,7 +49,7 @@ export default function LoginForm() {
 							fluid
 							size='large'
 							color='teal'
-							content='Login'
+							content='Register'
 						/>
 					</Form>
 				)}
