@@ -23,14 +23,16 @@ export default function SignedInMenu() {
 			<Image
 				avatar
 				spaced='right'
-				src={currentUserProfile.photoURL || '../../../assets/images/user.png'}
+				src={
+					(currentUserProfile && currentUserProfile.photoURL) || '../../../assets/images/user.png'
+				}
 			/>
-			<Dropdown pointing='top left' text={currentUserProfile.displayName}>
+			<Dropdown pointing='top left' text={currentUserProfile && currentUserProfile?.displayName}>
 				<Dropdown.Menu>
 					<Dropdown.Item as={Link} to='/createEvent' text='Create Event' icon='plus' />
 					<Dropdown.Item
 						as={Link}
-						to={`/profile/${currentUserProfile.id}`}
+						to={`/profile/${currentUserProfile && currentUserProfile?.id}`}
 						text='My Profile'
 						icon='user'
 					/>

@@ -17,7 +17,7 @@ export function verifyAuth() {
 			if (user) {
 				dispatch(signInUser(user));
 				const profileRef = getUserProfile(user.uid);
-				//console.log('user.uid', user.uid);
+				console.log('user.uid', user.uid);
 				profileRef.onSnapshot((snapshot) => {
 					dispatch(listenToCurrentUserProfile(dataFromSnapshot(snapshot)));
 					dispatch({ type: APP_LOADED });

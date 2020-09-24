@@ -3,6 +3,7 @@ import { Segment, Item, Icon, Button, Label } from 'semantic-ui-react';
 import EventListAttendee from './EventListAttendee';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
+import { deleteEventInFirestore } from '../../../firestore/firestoreService';
 
 export default function EventListItem({ event }) {
 	return (
@@ -22,7 +23,9 @@ export default function EventListItem({ event }) {
 							/>
 							<Item.Content>
 								<Item.Header as='a' content={event.title}></Item.Header>
-								<Item.Description>Hosted by {event.hostedBy}</Item.Description>
+								<Item.Description>
+									Hosted by <Link to={`/profile/${event.hostUid}`}>{event.hostedBy}</Link>
+								</Item.Description>
 								{event.isCancelled && (
 									<Label
 										style={{ top: '-40px' }}
@@ -54,7 +57,7 @@ export default function EventListItem({ event }) {
 						floated='right'
 						content='Delete Event'
 						onClick={() => {
-							//console.log(deleteEventInFirestore(event.id));
+							deleteEventInFirestore(event.id);
 						}}
 					/>
 					<Button
