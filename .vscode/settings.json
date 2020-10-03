@@ -1,5 +1,10 @@
 {
   "cSpell.ignoreWords": [
-    "firestore"
+    "firestore",
+    "toastify",
+    "unfollow"
+  ],
+  "cSpell.words": [
+    "Formik"
   ]
 }

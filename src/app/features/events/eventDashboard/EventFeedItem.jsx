@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Feed, Image } from 'semantic-ui-react';
+import { Feed } from 'semantic-ui-react';
 import { formatDistance } from 'date-fns';
 
 export default function EventFeedItem({ post }) {

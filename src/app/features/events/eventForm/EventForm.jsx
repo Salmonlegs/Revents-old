@@ -3,7 +3,6 @@ import React from 'react';
 import { Segment, Button, Header } from 'semantic-ui-react';
 import { Link, Redirect } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { listenToEvents } from '../eventActions';
 import { Formik, Form } from 'formik';
 import * as Yup from 'yup';
 import MyTextInput from '../../../common/form/MyTextInput';
@@ -21,6 +20,7 @@ import {
 } from '../../../firestore/firestoreService';
 import LoadingComponent from '../../../layout/LoadingComponent';
 import { toast } from 'react-toastify';
+import { listenToSelectedEvent } from '../eventActions';
 
 const EventForm = ({ match, history }) => {
 	const dispatch = useDispatch();
@@ -63,7 +63,7 @@ const EventForm = ({ match, history }) => {
 	useFirestoreDoc({
 		shouldExecute: !!match.params.id,
 		query: () => listenToEventFromFirestore(match.params.id),
-		data: (event) => dispatch(listenToEvents([event])),
+		data: (event) => dispatch(listenToSelectedEvent(event)),
 		deps: [match.params.id],
 	});
 

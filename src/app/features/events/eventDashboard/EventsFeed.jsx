@@ -23,10 +23,6 @@ export default function EventsFeed() {
 		};
 	}, [dispatch]);
 
-	const image = require('../../../../assets/images/user.png');
-	const date = '3 days ago';
-	const summary = 'Diana joins an event';
-
 	return (
 		<>
 			<Header attached color='teal' icon='newspaper' content='News Feed' />

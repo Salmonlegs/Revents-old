@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Segment, Header, Comment, Form, Button } from 'semantic-ui-react';
+import { Segment, Header, Comment } from 'semantic-ui-react';
 import { firebaseObjectToArray } from '../../../firestore/firestoreService';
 import { listenToEventChat } from '../eventActions';
 import EventDetailedChatForm from './EventDetailedChatForm';
